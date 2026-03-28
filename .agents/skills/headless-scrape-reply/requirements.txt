@@ -1,0 +1,17 @@
+# headless-scrape-reply 依赖清单
+# Author: RussellCooper
+#
+# 最小化依赖原则：每个包都有明确的不可替代理由
+#
+# playwright   — 唯一支持 CDP 模式 + async + 现代 Web 的无头浏览器库
+# openai       — OpenAI 兼容接口，支持 Ollama/本地 LLM
+# aiohttp      — 告警 Webhook 发送（async HTTP 客户端）
+# pyyaml       — 配置文件解析
+# pytest-asyncio — 异步测试支持
+
+playwright>=1.44.0
+openai>=1.30.0
+aiohttp>=3.9.0
+pyyaml>=6.0.1
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

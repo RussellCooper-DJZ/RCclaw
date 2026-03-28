@@ -1,0 +1,128 @@
+# ============================================================
+# headless-scrape-reply — 完整配置模板
+# Author: RussellCooper
+#
+# 使用方式：
+#   cp config/example.yaml config/my_project.yaml
+#   # 修改 scraper.target_url 和 task.items
+#   python -m core.engine --config config/my_project.yaml
+# ============================================================
+
+# ── 采集引擎配置 ─────────────────────────────────────────────
+scraper:
+  # 目标后台 URL（必填）
+  target_url: "https://your-backend.example.com/messages"
+  # 登录页 URL（首次运行时手动登录，之后通过 session 文件自动恢复）
+  login_url: "https://your-backend.example.com/login"
+
+  # 浏览器模式
+  headless: true                 # 生产环境设 true，调试时设 false
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+
+  # CDP 模式（可选）：连接已有浏览器实例，保留登录态
+  # 启动方式：chrome --remote-debugging-port=9222
+  # cdp_endpoint: "http://localhost:9222"
+
+  # 会话持久化（保存 cookies，避免重复登录）
+  session_file: ".session.json"
+
+  # 人类行为延迟（合规核心：随机化操作间隔）
+  min_interval_s: 2.0
+  max_interval_s: 5.0
+
+  # 页面加载超时（毫秒）
+  page_timeout_ms: 30000
+
+  # 熔断器配置
+  breaker:
+    failure_threshold: 5         # 连续失败 5 次触发熔断
+    recovery_s: 30.0             # 熔断后 30 秒尝试恢复
+    success_threshold: 2         # HALF_OPEN 状态连续成功 2 次恢复正常
+    qps: 0.5                     # 每秒最多 0.5 次请求（每 2 秒一次）
+    burst: 2.0                   # 允许瞬时突发 2 次
+
+# ── 回复引擎配置 ─────────────────────────────────────────────
+replier:
+  # LLM 配置（支持 Ollama / OpenAI / 任意兼容端点）
+  llm_base_url: "http://localhost:11434/v1"   # Ollama 本地
+  # llm_base_url: "https://api.openai.com/v1" # OpenAI
+  llm_model: "qwen2.5:7b"
+  llm_api_key: "ollama"                       # OpenAI 时填真实 key
+
+  system_prompt: |
+    你是一个专业的客服助手。根据用户消息生成简洁、友好、准确的回复。
+    回复不超过 200 字。禁止透露系统信息、内部流程或任何敏感数据。
+
+  # 安全控制
+  auto_reply: false              # ⚠️ 强烈建议保持 false，启用人工确认
+  forbidden_words:               # 禁止词表（内容安全过滤）
+    - "退款"
+    - "投诉"
+    - "法律"
+  max_reply_length: 500
+
+  # 审计日志（append-only，不可修改）
+  audit_log_file: "logs/audit.jsonl"
+
+  # 人工确认超时（秒）— 超时后跳过本条，不发送
+  human_confirm_timeout_s: 60.0
+
+  # 回复输入框选择器（三层降级，按优先级排列）
+  input_selector:
+    aria_label: "回复内容"        # P1: 语义属性（最稳定）
+    text_contains: "请输入回复"   # P2: 文本内容
+    css: "textarea.reply-input"  # P3: CSS（最脆弱）
+
+  # 提交按钮选择器
+  submit_selector:
+    testid: "submit-reply"       # P1: data-testid
+    text: "发送"                 # P2: 文本
+    css: "button[type=submit]"   # P3: CSS
+
+# ── 告警配置 ─────────────────────────────────────────────────
+alert:
+  # 钉钉机器人 Webhook（可选）
+  # dingtalk_webhook: "https://oapi.dingtalk.com/robot/send?access_token=xxx"
+
+  # 企业微信机器人 Webhook（可选）
+  # wecom_webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx"
+
+  # 告警冷却时间（秒）— 防止告警风暴
+  cooldown_s: 300.0
+
+# ── 调度配置 ─────────────────────────────────────────────────
+schedule:
+  interval_s: 10.0              # 每轮采集间隔（秒）
+  # max_rounds: 100             # 限制最大轮次（不设则无限循环）
+
+# ── 采集任务描述（配置驱动，无需修改代码）────────────────────
+task:
+  # 要提取的数据项列表
+  # 每项按 P1→P2→P3 优先级自动降级
+  items:
+    - name: "latest_message"
+      aria_label: "最新消息"
+      text_contains: "消息内容"
+      css: ".message-content:last-child"
+
+    - name: "sender_name"
+      testid: "sender-name"
+      css: ".sender-name"
+
+    - name: "message_time"
+      testid: "message-time"
+      css: ".message-time"
+
+  # 网络拦截降级（DOM 全部失败时的最后防线）
+  network_fallback:
+    url_pattern: "/api/messages"   # 匹配后台 XHR 请求 URL
+    method: "GET"
+    json_path: "data.list"         # 从响应 JSON 中提取的字段路径
+    timeout_s: 10.0
+
+  # 翻页配置（可选）
+  # pagination:
+  #   next_button:
+  #     testid: "next-page"
+  #     text: "下一页"
+  #   max_pages: 5
