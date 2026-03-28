@@ -91,7 +91,10 @@ export function splitShellArgs(raw: string): string[] | null {
     if (ch === "#" && buf.length === 0) {
       break;
     }
-    // charCode < 33 covers space(32) tab(9) LF(10) CR(13) FF(12) VT(11).
+    // charCode < 33 covers all ASCII control chars (0x00–0x1F) plus space (32).
+    // Standard POSIX delimiters: space(32), tab(9), LF(10), CR(13), FF(12), VT(11).
+    // Note: this also treats non-printable control bytes (0x00–0x08, 0x0E–0x1F)
+    // as delimiters — a safe default, but a behaviour change from /\s/.test(ch).
     if (ch.charCodeAt(0) < 33) {
       pushToken();
       continue;

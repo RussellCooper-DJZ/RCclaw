@@ -357,9 +357,8 @@ export function compileSafeRegexDetailed(source: string, flags = ""): SafeRegexC
     return { regex: null, source: trimmed, flags, reason: "empty" };
   }
   const cacheKey = `${flags}::${trimmed}`;
-  // Cache hit: Map.get() is O(1) and guaranteed to return the stored value
-  // when has() returned true — the nullish fallback is unreachable but kept
-  // for TypeScript's type narrowing.
+  // Single Map lookup: get() returns undefined only when the key is absent,
+  // so checking !== undefined is sufficient without a separate has() call.
   const cached = safeRegexCache.get(cacheKey);
   if (cached !== undefined) {
     return cached;

@@ -220,7 +220,12 @@ export async function runCommandWithTimeout(
   const hasInput = input !== undefined;
   const resolvedEnv = resolveCommandEnv({ argv, env });
 
-  const stdio = resolveCommandStdio({ hasInput, preferInherit: true });
+  // On Windows, npm-cli.js reads stdin during startup and fails with a signal
+  // (result.code === null) when stdin is inherited from a closed/null CI pipe.
+  // Use 'pipe' for stdin on Windows when there is no explicit input so the
+  // child process gets a proper (empty) pipe instead of a broken inherited handle.
+  const preferInherit = process.platform !== "win32";
+  const stdio = resolveCommandStdio({ hasInput, preferInherit });
   const finalArgv = process.platform === "win32" ? (resolveNpmArgvForWindows(argv) ?? argv) : argv;
   const resolvedCommand = finalArgv !== argv ? (finalArgv[0] ?? "") : resolveCommand(argv[0] ?? "");
   const useCmdWrapper = isWindowsBatchCommand(resolvedCommand);

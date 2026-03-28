@@ -20,7 +20,7 @@ export function normalizeSecretInput(value: unknown): string {
   // Three-step pipeline, each a single regex pass:
   //   1. Strip embedded line breaks (\r, \n, LS U+2028, PS U+2029).
   //   2. Drop non-Latin-1 code points (> U+00FF) that would cause
-  //      ByteString violations in HTTP headers.  The character class
+  //      ByteString violations in HTTP headers.
   //      Two ranges cover all non-Latin-1 code points:
   //        [\u0100-\uFFFF]  — BMP above Latin-1
   //        [\u{10000}-\u{10FFFF}]  — supplementary planes (emoji, etc.)
