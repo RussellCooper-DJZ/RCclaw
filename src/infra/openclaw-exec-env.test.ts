@@ -8,15 +8,15 @@ import {
 
 describe("markOpenClawExecEnv", () => {
   it("returns a cloned env object with the exec marker set", () => {
-    const env = { PATH: "/usr/bin", OPENCLAW_CLI: "0" };
+    const env = { PATH: "/usr/bin", RCCLAW_CLI: "0" };
     const marked = markOpenClawExecEnv(env);
 
     expect(marked).toEqual({
       PATH: "/usr/bin",
-      OPENCLAW_CLI: OPENCLAW_CLI_ENV_VALUE,
+      RCCLAW_CLI: OPENCLAW_CLI_ENV_VALUE,
     });
     expect(marked).not.toBe(env);
-    expect(env.OPENCLAW_CLI).toBe("0");
+    expect(env.RCCLAW_CLI).toBe("0");
   });
 });
 

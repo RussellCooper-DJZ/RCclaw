@@ -7,7 +7,7 @@ const OPENROUTER_APP_HEADERS: Record<string, string> = {
   "X-Title": "OpenClaw",
 };
 const KILOCODE_FEATURE_HEADER = "X-KILOCODE-FEATURE";
-const KILOCODE_FEATURE_DEFAULT = "openclaw";
+const KILOCODE_FEATURE_DEFAULT = "rcclaw";
 const KILOCODE_FEATURE_ENV_VAR = "KILOCODE_FEATURE";
 
 function resolveKilocodeAppHeaders(): Record<string, string> {

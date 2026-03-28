@@ -1,17 +1,22 @@
 {
-  "name": "openclaw",
+  "name": "rcclaw",
   "version": "2026.3.14",
-  "description": "Multi-channel AI gateway with extensible messaging integrations",
-  "keywords": [],
-  "homepage": "https://github.com/openclaw/openclaw#readme",
+  "description": "RCclaw — Multi-channel AI gateway with extensible messaging integrations. Based on openclaw (MIT).",
+  "keywords": [
+    "rcclaw",
+    "ai-gateway",
+    "multi-channel",
+    "messaging"
+  ],
+  "homepage": "https://github.com/RussellCooper-DJZ/RCclaw#readme",
   "bugs": {
-    "url": "https://github.com/openclaw/openclaw/issues"
+    "url": "https://github.com/RussellCooper-DJZ/RCclaw/issues"
   },
   "license": "MIT",
-  "author": "",
+  "author": "RussellCooper",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openclaw/openclaw.git"
+    "url": "git+https://github.com/RussellCooper-DJZ/RCclaw.git"
   },
   "bin": {
     "openclaw": "openclaw.mjs"
