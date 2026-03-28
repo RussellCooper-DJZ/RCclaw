@@ -3,9 +3,10 @@ import logging
 import random
 from typing import Any, Dict, List, Optional, Union
 
-from playwright.async_api import async_playwright, Page, Browser, BrowserContext
+from playwright.async_api import Browser, BrowserContext, Page, async_playwright
 
 logger = logging.getLogger(__name__)
+
 
 class AutomationEngine:
     """
@@ -16,18 +17,19 @@ class AutomationEngine:
     3. 结合视觉引擎的动态元素定位
     4. 异常恢复与状态保持
     """
+
     def __init__(
         self,
         headless: bool = True,
         user_data_dir: Optional[str] = "./browser_data",
         proxy: Optional[Dict[str, str]] = None,
-        timeout_ms: int = 30000
+        timeout_ms: int = 30000,
     ):
         self.headless = headless
         self.user_data_dir = user_data_dir
         self.proxy = proxy
         self.timeout_ms = timeout_ms
-        
+
         self._playwright = None
         self._browser: Optional[BrowserContext] = None
         self._page: Optional[Page] = None
@@ -35,15 +37,15 @@ class AutomationEngine:
     async def start(self):
         """启动浏览器实例。"""
         self._playwright = await async_playwright().start()
-        
+
         launch_args = {
             "headless": self.headless,
             "args": [
                 "--disable-blink-features=AutomationControlled",
                 "--disable-infobars",
                 "--no-sandbox",
-                "--disable-setuid-sandbox"
-            ]
+                "--disable-setuid-sandbox",
+            ],
         }
         if self.proxy:
             launch_args["proxy"] = self.proxy
@@ -53,22 +55,22 @@ class AutomationEngine:
                 user_data_dir=self.user_data_dir,
                 **launch_args,
                 viewport={"width": 1920, "height": 1080},
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             )
         else:
             browser_instance = await self._playwright.chromium.launch(**launch_args)
             self._browser = await browser_instance.new_context(
                 viewport={"width": 1920, "height": 1080},
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             )
-            
+
         # 注入反爬虫脚本
         await self._browser.add_init_script("""
             Object.defineProperty(navigator, 'webdriver', {
                 get: () => undefined
             });
         """)
-        
+
         self._page = await self._browser.new_page()
         self._page.set_default_timeout(self.timeout_ms)
         logger.info("Automation engine started.")
@@ -109,7 +111,7 @@ class AutomationEngine:
             try:
                 element = self._page.locator(sel).first
                 await element.wait_for(state="visible", timeout=5000)
-                
+
                 # 模拟人类点击：移动到元素上，稍作停顿，然后点击
                 box = await element.bounding_box()
                 if box:
@@ -120,17 +122,19 @@ class AutomationEngine:
                     await self._page.mouse.click(x, y)
                 else:
                     await element.click()
-                    
+
                 logger.info(f"Successfully clicked element using selector: {sel}")
                 return True
             except Exception as e:
                 logger.debug(f"Failed to click selector {sel}: {e}")
                 continue
-                
+
         logger.error(f"All selectors failed for click operation. Primary: {selector}")
         return False
 
-    async def smart_fill(self, selector: str, text: str, fallback_selectors: List[str] = None) -> bool:
+    async def smart_fill(
+        self, selector: str, text: str, fallback_selectors: List[str] = None
+    ) -> bool:
         """
         智能输入：模拟人类打字速度。
         """
@@ -139,20 +143,20 @@ class AutomationEngine:
             try:
                 element = self._page.locator(sel).first
                 await element.wait_for(state="visible", timeout=5000)
-                
+
                 await element.click()
-                await element.fill("") # 清空
-                
+                await element.fill("")  # 清空
+
                 # 模拟人类打字
                 for char in text:
                     await element.type(char, delay=random.randint(30, 100))
-                    
+
                 logger.info(f"Successfully filled text using selector: {sel}")
                 return True
             except Exception as e:
                 logger.debug(f"Failed to fill selector {sel}: {e}")
                 continue
-                
+
         logger.error(f"All selectors failed for fill operation. Primary: {selector}")
         return False
 
@@ -168,7 +172,7 @@ class AutomationEngine:
                 if not elements:
                     result[field] = None
                     continue
-                    
+
                 if len(elements) == 1:
                     result[field] = await elements[0].inner_text()
                 else:
@@ -176,7 +180,7 @@ class AutomationEngine:
             except Exception as e:
                 logger.warning(f"Failed to extract field {field}: {e}")
                 result[field] = None
-                
+
         return result
 
     async def take_screenshot(self, full_page: bool = False) -> bytes:
