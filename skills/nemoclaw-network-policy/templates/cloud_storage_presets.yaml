@@ -1,0 +1,126 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# 云存储服务网络策略预设 (Cloud Storage Network Policy Preset)
+# 
+# 本文件包含了主流云存储服务（AWS S3, Azure Blob Storage, Google Cloud Storage, Cloudflare R2）
+# 的网络访问白名单配置。
+# 
+# 注意：NemoClaw 策略不支持 `host: "*"` 这样的全局通配符。
+# 对于 S3 这种采用 `<bucket-name>.s3.<region>.amazonaws.com` 格式的服务，
+# 建议在实际使用时，将下方的示例域名替换为您实际使用的特定 Bucket 域名，
+# 或者使用路径风格的 API (s3.amazonaws.com/bucket-name) 以收紧权限。
+
+version: 1
+network_policies:
+  # ── AWS S3 & STS ─────────────────────────────────────────────────────
+  aws_s3:
+    name: aws_s3
+    endpoints:
+      # S3 全局端点 (通常用于路径风格访问，如 https://s3.amazonaws.com/my-bucket)
+      - host: s3.amazonaws.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "*", path: "/**" }
+      
+      # S3 区域端点示例 (如果您使用特定区域，请取消注释并修改为您实际的区域)
+      # - host: s3.us-east-1.amazonaws.com
+      #   port: 443
+      #   protocol: rest
+      #   enforcement: enforce
+      #   tls: terminate
+      #   rules:
+      #     - allow: { method: "*", path: "/**" }
+      
+      # AWS STS (Security Token Service) - 用于获取临时凭证
+      - host: sts.amazonaws.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "POST", path: "/**" }
+    binaries:
+      - { path: /usr/local/bin/aws }
+      - { path: /usr/local/bin/python }
+
+  # ── Azure Blob Storage ───────────────────────────────────────────────
+  azure_blob:
+    name: azure_blob
+    endpoints:
+      # Azure Blob 核心端点 (实际使用时，通常为 <account-name>.blob.core.windows.net)
+      # 请将 myaccount 替换为您的实际存储账户名
+      - host: myaccount.blob.core.windows.net
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "*", path: "/**" }
+      
+      # Azure 身份验证端点 (用于获取 OAuth 令牌)
+      - host: login.microsoftonline.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "POST", path: "/**" }
+    binaries:
+      - { path: /usr/local/bin/az }
+      - { path: /usr/local/bin/python }
+
+  # ── Google Cloud Storage (GCS) ───────────────────────────────────────
+  google_cloud_storage:
+    name: google_cloud_storage
+    endpoints:
+      # GCS 默认 REST API 端点
+      - host: storage.googleapis.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "*", path: "/**" }
+      
+      # Google OAuth 2.0 身份验证端点
+      - host: oauth2.googleapis.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "POST", path: "/**" }
+    binaries:
+      - { path: /usr/local/bin/gcloud }
+      - { path: /usr/local/bin/python }
+
+  # ── Cloudflare R2 ────────────────────────────────────────────────────
+  cloudflare_r2:
+    name: cloudflare_r2
+    endpoints:
+      # Cloudflare R2 S3 兼容 API 端点
+      # 格式通常为: <account-id>.r2.cloudflarestorage.com
+      # 请将 my-account-id 替换为您的实际 Account ID
+      - host: my-account-id.r2.cloudflarestorage.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "*", path: "/**" }
+      
+      # Cloudflare API 端点 (用于管理 Bucket 等)
+      - host: api.cloudflare.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "*", path: "/**" }
+    binaries:
+      - { path: /usr/local/bin/python }
+      - { path: /usr/bin/curl }
