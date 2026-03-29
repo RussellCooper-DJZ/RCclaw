@@ -1,0 +1,9 @@
+{
+  "name": "nemoclaw-network-policy",
+  "version": "1.0.0",
+  "description": "Manage NemoClaw dynamic network policies with default-deny, precise whitelisting, and hot-reloading.",
+  "author": "Manus AI",
+  "dependencies": {
+    "python": ["pyyaml"]
+  }
+}

@@ -1,0 +1,16 @@
+version: 1
+network_policies:
+  custom_api_access:
+    name: custom_api_access
+    endpoints:
+      - host: api.example.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: "GET", path: "/v1/data/**" }
+          - allow: { method: "POST", path: "/v1/submit" }
+    binaries:
+      - { path: /usr/bin/curl }
+      - { path: /usr/local/bin/python }
