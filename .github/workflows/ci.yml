@@ -22,7 +22,7 @@ jobs:
       docs_changed: ${{ steps.check.outputs.docs_changed }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
           fetch-tags: false
@@ -52,7 +52,7 @@ jobs:
       run_windows: ${{ steps.scope.outputs.run_windows }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
           fetch-tags: false
@@ -87,7 +87,7 @@ jobs:
       changed_extensions_matrix: ${{ steps.changed.outputs.changed_extensions_matrix }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
           fetch-tags: false
@@ -129,7 +129,7 @@ jobs:
     runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -163,7 +163,7 @@ jobs:
     runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -222,7 +222,7 @@ jobs:
 
       - name: Checkout
         if: github.event_name != 'pull_request' || matrix.runtime != 'bun'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -262,7 +262,7 @@ jobs:
       matrix: ${{ fromJson(needs.changed-extensions.outputs.changed_extensions_matrix) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -283,7 +283,7 @@ jobs:
     runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -309,7 +309,7 @@ jobs:
     runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -338,7 +338,7 @@ jobs:
     runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -358,7 +358,7 @@ jobs:
     runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -391,7 +391,7 @@ jobs:
     runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -415,7 +415,7 @@ jobs:
     runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -536,7 +536,7 @@ jobs:
             command: pnpm test
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -622,7 +622,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -694,7 +694,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
@@ -863,7 +863,7 @@ jobs:
             command: ./gradlew --no-daemon :app:assembleDebug
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: false
 
